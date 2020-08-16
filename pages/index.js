@@ -1,8 +1,7 @@
 import Head from "next/head";
-import CreatePost from "../components/CreatePost";
 import PostList from "../components/PostList";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import fire from "../config/fire-config";
 import Link from "next/link";
 
@@ -46,7 +45,11 @@ const Home = () => {
         <button onClick={handleLogout}>Logout</button>
       )}
       <PostList />
-      {loggedIn && <CreatePost />}
+      {loggedIn && (
+        <Link href="/management/dashboard">
+          <a> Admin</a>
+        </Link>
+      )}
     </div>
   );
 };

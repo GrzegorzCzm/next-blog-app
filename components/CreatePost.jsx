@@ -1,22 +1,45 @@
 import React, { useState } from "react";
 import fire from "../config/fire-config";
+
+const whiteSpaceRegex = / /g;
+
 const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [notification, setNotification] = useState("");
   const handleSubmit = (event) => {
+    const postId = title.replace(whiteSpaceRegex, "-").toLowerCase();
     event.preventDefault();
-    fire.firestore().collection("blog").add({
-      title: title,
-      content: content,
+
+    const usersRef = fire.firestore().collection("blog").doc(postId);
+
+    usersRef.get().then((docSnapshot) => {
+      if (docSnapshot.exists) {
+        usersRef.onSnapshot((doc) => {
+          setNotification("Post with given name already exists");
+        });
+      } else {
+        usersRef
+          .set({
+            title: title,
+            content: content,
+          })
+          .then(() => {
+            setTitle("");
+            setContent("");
+            setNotification("Blogpost created");
+            setTimeout(() => {
+              setNotification("");
+            }, 2000);
+          })
+          .catch((error) => {
+            console.warn(e);
+            setNotification("Unable to crete new post");
+          });
+      }
     });
-    setTitle("");
-    setContent("");
-    setNotification("Blogpost created");
-    setTimeout(() => {
-      setNotification("");
-    }, 2000);
   };
+
   return (
     <div>
       <h2>Add Blog</h2>

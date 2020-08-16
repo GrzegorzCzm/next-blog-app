@@ -1,5 +1,4 @@
 import { useState } from "react";
-import firebase from "firebase";
 import fire from "../../config/fire-config";
 import { useRouter } from "next/router";
 

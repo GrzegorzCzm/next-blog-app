@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import CreatePost from "../../components/CreatePost";
+import UpdatePost from "../../components/UpdatePost";
 import PostList from "../../components/PostList";
 
 import { useState } from "react";
@@ -11,6 +11,7 @@ const Dashboard = () => {
   const router = useRouter();
 
   const [loggedIn, setLoggedIn] = useState(false);
+  const [currentPost, setCurrentPost] = useState({});
   fire.auth().onAuthStateChanged((user) => {
     if (user) {
       setLoggedIn(true);
@@ -20,6 +21,9 @@ const Dashboard = () => {
     }
   });
 
+  const onEditPost = (postData) => setCurrentPost(postData);
+  const onPostSaved = () => setCurrentPost({});
+
   if (loggedIn) {
     return (
       <div>
@@ -27,8 +31,8 @@ const Dashboard = () => {
           <title>Blog App</title>
         </Head>
         <h1>Dashboard</h1>
-        <CreatePost />
-        <PostList isAuth={loggedIn} />
+        <UpdatePost currentPost={currentPost} onPostSaved={onPostSaved} />
+        <PostList isAuth={loggedIn} onEdit={onEditPost} />
       </div>
     );
   } else {

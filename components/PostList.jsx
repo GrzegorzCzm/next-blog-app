@@ -3,10 +3,11 @@ import Link from "next/link";
 
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 
 import fire from "../config/fire-config";
 
-const PostList = ({ isAuth = false }) => {
+const PostList = ({ isAuth = false, onEdit }) => {
   const [blogs, setBlogs] = useState([]);
   useEffect(() => {
     fire
@@ -36,6 +37,12 @@ const PostList = ({ isAuth = false }) => {
     </IconButton>
   );
 
+  const EditButton = ({ postData }) => (
+    <IconButton aria-label="edit" onClick={() => onEdit(postData)}>
+      <EditIcon fontSize="small" />
+    </IconButton>
+  );
+
   return (
     <div>
       <ul>
@@ -45,6 +52,15 @@ const PostList = ({ isAuth = false }) => {
               <a>{blog.title}</a>
             </Link>
             {isAuth && <DeleteButton postId={blog.id} />}
+            {isAuth && (
+              <EditButton
+                postData={{
+                  orgTitle: blog.title,
+                  orgContent: blog.content,
+                  orgId: blog.id,
+                }}
+              />
+            )}
           </li>
         ))}
       </ul>

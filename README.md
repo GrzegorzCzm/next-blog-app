@@ -7,8 +7,6 @@ Backlog - https://dev-training.myjetbrains.com/youtrack/agiles/95-5/96-6
 First, run the development server:
 
 ```bash
-npm run dev
-# or
 yarn dev
 ```
 

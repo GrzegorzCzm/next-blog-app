@@ -5,14 +5,15 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 
+import { deletePost } from "../utils/firestoreApi";
 import fire from "../config/fire-config";
 
-const PostList = ({ isAuth = false, onEdit }) => {
+const PostList = ({ isAuth = false, onEdit, collectionName }) => {
   const [blogs, setBlogs] = useState([]);
   useEffect(() => {
     fire
       .firestore()
-      .collection("blog")
+      .collection(collectionName)
       .onSnapshot((snap) => {
         const blogs = snap.docs.map((doc) => ({
           id: doc.id,
@@ -23,12 +24,7 @@ const PostList = ({ isAuth = false, onEdit }) => {
   }, []);
 
   const onDelete = async (id) => {
-    try {
-      const res = await fire.firestore().collection("blog").doc(id).delete();
-      console.log("Document successfully deleted!", JSON);
-    } catch (error) {
-      console.error("Error removing document: ", error);
-    }
+    deletePost(id, collectionName);
   };
 
   const DeleteButton = ({ postId }) => (
@@ -58,6 +54,7 @@ const PostList = ({ isAuth = false, onEdit }) => {
                   orgTitle: blog.title,
                   orgContent: blog.content,
                   orgId: blog.id,
+                  orgIsPublic: blog.isPublic,
                 }}
               />
             )}

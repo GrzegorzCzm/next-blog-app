@@ -32,7 +32,15 @@ const Dashboard = () => {
         </Head>
         <h1>Dashboard</h1>
         <UpdatePost currentPost={currentPost} onPostSaved={onPostSaved} />
-        <PostList isAuth={loggedIn} onEdit={onEditPost} />
+
+        <h2>Public</h2>
+        <PostList isAuth={loggedIn} onEdit={onEditPost} collectionName="blog" />
+        <h2>Draft</h2>
+        <PostList
+          isAuth={loggedIn}
+          onEdit={onEditPost}
+          collectionName="blog-draft"
+        />
       </div>
     );
   } else {

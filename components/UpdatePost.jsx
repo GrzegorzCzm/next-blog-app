@@ -1,37 +1,58 @@
+import { CheckBox } from "@material-ui/icons";
 import React, { useState, useEffect } from "react";
 
+import { deletePost, getRef, setDoc } from "../utils/firestoreApi";
 import fire from "../config/fire-config";
 
 const whiteSpaceRegex = / /g;
 
-const CreatePost = ({ currentPost = {}, onPostSaved }) => {
-  const { orgTitle, orgContent, orgId } = currentPost;
+const UpdatePost = ({ currentPost = {}, onPostSaved }) => {
+  const { orgTitle, orgContent, orgId, orgIsPublic } = currentPost;
   useEffect(() => {
     if (currentPost.orgId) {
       setContent(orgContent);
       setTitle(orgTitle);
+      setPublic(orgIsPublic);
     }
   }, [orgTitle, orgContent, orgId]);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [notification, setNotification] = useState("");
+  const [isPublic, setPublic] = useState(false);
 
   const clearState = () => {
     setTitle("");
     setContent("");
+    setPublic(false);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const addNewPost = async (post, collectionName) => {
+    try {
+      const postRef = await getRef(post.urlPath, collectionName);
 
-    if (orgId) {
+      const docContent = await postRef.get();
+      if (docContent.exists) {
+        setNotification("Post already exists");
+      } else {
+        await setDoc({ collectionName, docKey: post.urlPath, content: post });
+        clearState();
+        setNotification("Post created");
+        onPostSaved();
+      }
+    } catch (err) {
+      console.error("ERROR ON CREATE", JSON.stringify(err));
+      setNotification("ERROR ON CREATE: ", JSON.stringify(err));
+    }
+  };
+
+  const updatePost = async (post, collectionName) => {
+    const isSameCollection = isPublic === orgIsPublic;
+
+    if (isSameCollection) {
       try {
-        const postRef = await fire.firestore().collection("blog").doc(orgId);
-        await postRef.update({
-          title,
-          content,
-        });
+        const postRef = await getRef(orgId, collectionName);
+        await postRef.update(post);
         clearState();
         setNotification("Blogpost updated");
         onPostSaved();
@@ -40,26 +61,35 @@ const CreatePost = ({ currentPost = {}, onPostSaved }) => {
         setNotification("ERROR ON UPDATE: ", JSON.stringify(err));
       }
     } else {
+      deletePost(orgId, orgIsPublic ? "blog" : "blog-draft");
+      addNewPost({ ...post, urlPath: orgId }, collectionName);
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const collectionName = isPublic ? "blog" : "blog-draft";
+    if (orgId) {
+      updatePost(
+        {
+          title,
+          content,
+          isPublic,
+        },
+        collectionName
+      );
+    } else {
       const urlPath = title.replace(whiteSpaceRegex, "-").toLowerCase();
-      try {
-        const postRef = await fire.firestore().collection("blog").doc(urlPath);
-        const docContent = await postRef.get();
-        if (docContent.exists) {
-          setNotification("Post already exists");
-        } else {
-          await fire.firestore().collection("blog").doc(urlPath).set({
-            urlPath,
-            title,
-            content,
-          });
-          clearState();
-          setNotification("Post created");
-          onPostSaved();
-        }
-      } catch (err) {
-        console.log("ERROR ON CREATE", JSON.stringify(err));
-        setNotification("ERROR ON CREATE: ", JSON.stringify(err));
-      }
+      addNewPost(
+        {
+          urlPath,
+          title,
+          content,
+          isPublic,
+        },
+        collectionName
+      );
     }
   };
 
@@ -85,9 +115,18 @@ const CreatePost = ({ currentPost = {}, onPostSaved }) => {
             onChange={({ target }) => setContent(target.value)}
           />
         </div>
+        <div>
+          <input
+            id="isPublic"
+            type="checkbox"
+            checked={isPublic}
+            onChange={() => setPublic(!isPublic)}
+          />
+          <label for="isPublic">Is public</label>
+        </div>
         <button type="submit">Save</button>
       </form>
     </div>
   );
 };
-export default CreatePost;
+export default UpdatePost;

@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 
 import UpdatePost from "../../components/UpdatePost";
 import PostList from "../../components/PostList";
+import TagList from "../../components/TagList";
 
 import { useState } from "react";
 import fire from "../../config/fire-config";
@@ -41,6 +42,8 @@ const Dashboard = () => {
           onEdit={onEditPost}
           collectionName="blog-draft"
         />
+        <h2>Tags</h2>
+        <TagList isAuth={loggedIn} collectionName="tags" />
       </div>
     );
   } else {

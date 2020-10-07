@@ -1,8 +1,6 @@
-import { CheckBox } from "@material-ui/icons";
 import React, { useState, useEffect } from "react";
 
-import { deletePost, getRef, setDoc } from "../utils/firestoreApi";
-import fire from "../config/fire-config";
+import { deleteDoc, getRef, setDoc } from "../utils/firestoreApi";
 
 const whiteSpaceRegex = / /g;
 
@@ -61,7 +59,7 @@ const UpdatePost = ({ currentPost = {}, onPostSaved }) => {
         setNotification("ERROR ON UPDATE: ", JSON.stringify(err));
       }
     } else {
-      deletePost(orgId, orgIsPublic ? "blog" : "blog-draft");
+      deleteDoc(orgId, orgIsPublic ? "blog" : "blog-draft");
       addNewPost({ ...post, urlPath: orgId }, collectionName);
     }
   };

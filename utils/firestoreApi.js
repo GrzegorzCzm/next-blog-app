@@ -1,6 +1,6 @@
 import fire from "../config/fire-config";
 
-export const deletePost = async (id, collectionName) => {
+export const deleteDoc = async (id, collectionName) => {
   try {
     const res = await fire
       .firestore()

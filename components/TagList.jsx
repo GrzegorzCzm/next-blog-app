@@ -8,27 +8,9 @@ import { deleteDoc } from "../utils/firestoreApi";
 import fire from "../config/fire-config";
 import AddTag from "./AddTag";
 
-const TagList = ({ isAuth = false, collectionName }) => {
-  const [tags, setTags] = useState([]);
-  useEffect(() => {
-    fire
-      .firestore()
-      .collection(collectionName)
-      .onSnapshot((snap) => {
-        const tagsDoc = snap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setTags(tagsDoc);
-      });
-  }, []);
-
-  const onDelete = async (id) => {
-    deleteDoc(id, collectionName);
-  };
-
-  const DeleteButton = ({ tagId }) => (
-    <IconButton aria-label="delete" onClick={() => onDelete(tagId)}>
+const TagList = ({ tags = [], onDelete, onAdd }) => {
+  const DeleteButton = ({ tag }) => (
+    <IconButton aria-label="delete" onClick={() => onDelete(tag)}>
       <DeleteIcon fontSize="small" />
     </IconButton>
   );
@@ -37,15 +19,16 @@ const TagList = ({ isAuth = false, collectionName }) => {
     <div>
       <ul>
         {tags.map((tag) => (
-          <li key={tag.id}>
-            <Link href="/tag/[id]" as={"/tag/" + tag.id}>
-              <a>{tag.title}</a>
+          <li key={tag}>
+            <Link href="/tag/[id]" as={"/tag/" + tag}>
+              <a>{tag}</a>
             </Link>
-            {isAuth && <DeleteButton tagId={tag.id} />}
+            <DeleteButton tag={tag} />
           </li>
         ))}
       </ul>
-      <AddTag collectionName="tags" />
+      <AddTag onAdd={onAdd} />
+      <hr />
     </div>
   );
 };

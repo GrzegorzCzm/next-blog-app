@@ -9,17 +9,17 @@ import { deleteDoc } from "../utils/firestoreApi";
 import fire from "../config/fire-config";
 
 const PostList = ({ isAuth = false, onEdit, collectionName }) => {
-  const [blogs, setBlogs] = useState([]);
+  const [posts, setPosts] = useState([]);
   useEffect(() => {
     fire
       .firestore()
       .collection(collectionName)
       .onSnapshot((snap) => {
-        const blogs = snap.docs.map((doc) => ({
+        const postList = snap.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setBlogs(blogs);
+        setPosts(postList);
       });
   }, []);
 
@@ -42,19 +42,20 @@ const PostList = ({ isAuth = false, onEdit, collectionName }) => {
   return (
     <div>
       <ul>
-        {blogs.map((blog) => (
-          <li key={blog.id}>
-            <Link href="/blog/[id]" as={"/blog/" + blog.id}>
-              <a>{blog.title}</a>
+        {posts.map((post) => (
+          <li key={post.id}>
+            <Link href="/post/[id]" as={"/post/" + post.id}>
+              <a>{post.title}</a>
             </Link>
-            {isAuth && <DeleteButton postId={blog.id} />}
+            {isAuth && <DeleteButton postId={post.id} />}
             {isAuth && (
               <EditButton
                 postData={{
-                  orgTitle: blog.title,
-                  orgContent: blog.content,
-                  orgId: blog.id,
-                  orgIsPublic: blog.isPublic,
+                  orgTitle: post.title,
+                  orgContent: post.content,
+                  orgTags: post.tags,
+                  orgId: post.id,
+                  orgIsPublic: post.isPublic,
                 }}
               />
             )}

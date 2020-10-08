@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 
 import UpdatePost from "../../components/UpdatePost";
 import PostList from "../../components/PostList";
-import TagList from "../../components/TagList";
 
 import { useState } from "react";
 import fire from "../../config/fire-config";
@@ -35,15 +34,13 @@ const Dashboard = () => {
         <UpdatePost currentPost={currentPost} onPostSaved={onPostSaved} />
 
         <h2>Public</h2>
-        <PostList isAuth={loggedIn} onEdit={onEditPost} collectionName="blog" />
+        <PostList isAuth={loggedIn} onEdit={onEditPost} collectionName="post" />
         <h2>Draft</h2>
         <PostList
           isAuth={loggedIn}
           onEdit={onEditPost}
-          collectionName="blog-draft"
+          collectionName="post-draft"
         />
-        <h2>Tags</h2>
-        <TagList isAuth={loggedIn} collectionName="tags" />
       </div>
     );
   } else {

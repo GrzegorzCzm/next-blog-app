@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from "react";
 
 import { deleteDoc, getRef, setDoc } from "../utils/firestoreApi";
+import TagList from "./TagList";
 
 const whiteSpaceRegex = / /g;
 
 const UpdatePost = ({ currentPost = {}, onPostSaved }) => {
-  const { orgTitle, orgContent, orgId, orgIsPublic } = currentPost;
+  const { orgTitle, orgContent, orgTags, orgId, orgIsPublic } = currentPost;
   useEffect(() => {
     if (currentPost.orgId) {
       setContent(orgContent);
       setTitle(orgTitle);
+      setTags(orgTags ? orgTags : []);
       setPublic(orgIsPublic);
     }
-  }, [orgTitle, orgContent, orgId]);
+  }, [orgTitle, orgContent, orgId, orgTags]);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState([]);
+
   const [notification, setNotification] = useState("");
   const [isPublic, setPublic] = useState(false);
 
   const clearState = () => {
     setTitle("");
     setContent("");
+    setTags([]);
     setPublic(false);
   };
 
@@ -46,7 +51,6 @@ const UpdatePost = ({ currentPost = {}, onPostSaved }) => {
 
   const updatePost = async (post, collectionName) => {
     const isSameCollection = isPublic === orgIsPublic;
-
     if (isSameCollection) {
       try {
         const postRef = await getRef(orgId, collectionName);
@@ -59,20 +63,20 @@ const UpdatePost = ({ currentPost = {}, onPostSaved }) => {
         setNotification("ERROR ON UPDATE: ", JSON.stringify(err));
       }
     } else {
-      deleteDoc(orgId, orgIsPublic ? "blog" : "blog-draft");
+      deleteDoc(orgId, orgIsPublic ? "post" : "post-draft");
       addNewPost({ ...post, urlPath: orgId }, collectionName);
     }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const collectionName = isPublic ? "blog" : "blog-draft";
+    const collectionName = isPublic ? "post" : "post-draft";
     if (orgId) {
       updatePost(
         {
           title,
           content,
+          tags,
           isPublic,
         },
         collectionName
@@ -84,6 +88,7 @@ const UpdatePost = ({ currentPost = {}, onPostSaved }) => {
           urlPath,
           title,
           content,
+          tags,
           isPublic,
         },
         collectionName
@@ -114,6 +119,17 @@ const UpdatePost = ({ currentPost = {}, onPostSaved }) => {
           />
         </div>
         <div>
+          <hr />
+          <h2>Tags</h2>
+          <TagList
+            tags={tags}
+            onAdd={(tag) => {
+              setTags([...tags, tag]);
+            }}
+            onDelete={(tag) => setTags(tags.filter((t) => t !== tag))}
+          />
+        </div>
+        <div>
           <input
             id="isPublic"
             type="checkbox"
@@ -122,7 +138,9 @@ const UpdatePost = ({ currentPost = {}, onPostSaved }) => {
           />
           <label for="isPublic">Is public</label>
         </div>
-        <button type="submit">Save</button>
+        <button key="submit-update-post" type="submit">
+          Save Post
+        </button>
       </form>
     </div>
   );

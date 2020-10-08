@@ -44,7 +44,7 @@ const Home = () => {
       ) : (
         <button onClick={handleLogout}>Logout</button>
       )}
-      <PostList collectionName="blog" />
+      <PostList collectionName="post" />
       {loggedIn && (
         <Link href="/management/dashboard">
           <a> Admin</a>

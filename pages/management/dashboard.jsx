@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 
 import UpdatePost from "../../components/UpdatePost";
 import PostList from "../../components/PostList";
+import TagMap from "../../components/TagMap";
 
 import { useState } from "react";
 import fire from "../../config/fire-config";
@@ -41,6 +42,9 @@ const Dashboard = () => {
           onEdit={onEditPost}
           collectionName="post-draft"
         />
+        <hr />
+        <h2>Tag map</h2>
+        <TagMap />
       </div>
     );
   } else {

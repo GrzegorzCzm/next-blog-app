@@ -5,23 +5,18 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 
-import { deleteDoc } from "../utils/firestoreApi";
+import { deleteDoc, getDocList } from "../utils/firestoreApi";
 import fire from "../config/fire-config";
 
 const PostList = ({ isAuth = false, onEdit, collectionName }) => {
   const [posts, setPosts] = useState([]);
   useEffect(() => {
-    fire
-      .firestore()
-      .collection(collectionName)
-      .onSnapshot((snap) => {
-        const postList = snap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPosts(postList);
-      });
+    getDocList(collectionName, setPostsList);
   }, []);
+
+  const setPostsList = (postList) => {
+    setPosts(postList);
+  };
 
   const onDelete = async (id) => {
     deleteDoc(id, collectionName);
